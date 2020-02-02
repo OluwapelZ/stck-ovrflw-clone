@@ -466,16 +466,6 @@ components:
           type: string
         displayName:
           type: string
-    Success:
-      type: object
-      required:
-        - status
-        - message
-      properties:
-        status:
-          type: string
-        message:
-          type: string
     Error:
       type: object
       required:
