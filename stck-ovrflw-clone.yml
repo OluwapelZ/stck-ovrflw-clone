@@ -1,11 +1,11 @@
 openapi: "3.0.0"
 info:
-  description: "This is the documentation of a simple clone stack over server.
+  description: "This is the documentation of a simple clone of stack overflow's server.
   If you have any questions, you can reach out to us via interview@softcom.ng"
   version: 1.0.0
   title: Stack Overflow Clone
   contact:
-    email: "oluwapelumi@interview.softcom.ng"
+    email: "olaoyeoluwapelumi@gmail.com"
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
@@ -27,11 +27,7 @@ paths:
         $ref: "#/components/requestBodies/createUser"
       responses:
         '201':
-          description: Successful creation response
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Success"
+          description: Successfully created a user
         '400':
           description: Bad request
           content:
@@ -77,13 +73,8 @@ paths:
       operationId: askQuestion
       tags:
         - question
-      parameters:
-        - in: path
-          name: userId
-          description: Id of the user asking the question
-          required: true
-          schema:
-            type: integer
+      security:
+        - bearerAuth: []
       requestBody:
         $ref: "#/components/requestBodies/askQuestion"
       responses:
@@ -99,6 +90,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         '404':
           description: User with the provided id does not exist
           content:
@@ -116,6 +113,8 @@ paths:
       operationId: viewQuestions
       tags:
         - question
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: List of previously asked questions
@@ -123,6 +122,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/QuestionsResponse"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         default:
           description: unexpected error
           content:
@@ -135,6 +140,8 @@ paths:
       operationId: answerQuestion
       tags:
         - question
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -145,18 +152,20 @@ paths:
       requestBody:
         $ref: "#/components/requestBodies/answerQuestion"
       responses:
-        '200':
-          description: Question answer updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Success"
+        '201':
+          description: Successfully answered a question
         '400':
           description: Bad request
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         '404':
           description: Question with the provided id does not exist
           content:
@@ -175,6 +184,8 @@ paths:
       operationId: upvoteQuestion
       tags:
         - question
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -195,17 +206,19 @@ paths:
                   description: Username of the user upvoting the question
       responses:
         '200':
-          description: Question answer updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Success"
+          description: Successfully upvoted a question
         '404':
           description: Question with the provided id does not exist
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         default:
           description: unexpected error
           content:
@@ -218,6 +231,8 @@ paths:
       operationId: downvoteQuestion
       tags:
         - question
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: id
@@ -225,30 +240,21 @@ paths:
           required: true
           schema:
             type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - username
-              properties:
-                username:
-                  type: string
-                  description: Username of the user downvoting the question
       responses:
         '200':
-          description: Question answer updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Success"
+          description: Successfully downvoted a question
         '404':
           description: Question with the provided id does not exist
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         default:
           description: unexpected error
           content:
@@ -261,6 +267,8 @@ paths:
       operationId: searchQuestions
       tags:
         - question
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: searchTerm
@@ -275,6 +283,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/QuestionsResponse"
+        '401':
+          description: Access denied, please provide a valid token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/responses/UnauthorizedError"
         '400':
           description: Bad Request. Please ensure the search query is provided
           content:
@@ -290,6 +304,15 @@ paths:
       
 
 components:
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: Bearer token that contains user's id
+      scheme: bearer
+      bearerFormat: <token>
   requestBodies:
     answerQuestion:
       description: Request data to answer question
@@ -360,8 +383,8 @@ components:
         - question
         - username
         - answers
-        - upvote
-        - downvote
+        - upvotes
+        - downvotes
         - createdAt
       properties:
         id:
@@ -376,20 +399,17 @@ components:
           description: Username of the user that asked the question
         answers:
           $ref: "#/components/schemas/Answers"
-        upvote:
+        upvotes:
           type: integer
-        downvote:
+        downvotes:
           type: integer
         createdAt:
           type: string
     QuestionResponse:
       type: object
       required:
-        - status
         - data
       properties:
-        status:
-          type: string
         data:
           $ref: "#/components/schemas/Question"
     Questions:
@@ -399,11 +419,8 @@ components:
     QuestionsResponse:
       type: object
       required:
-        - status
         - data
       properties:
-        status:
-          type: string
         data:
           $ref: "#/components/schemas/Questions"
     Answer:
@@ -432,11 +449,8 @@ components:
     AuthUser:
       type: object
       required:
-        - status
         - data
       properties:
-        status:
-          type: string
         data:
           $ref: "#/components/schemas/AuthUserDetails"
     AuthUserDetails:
