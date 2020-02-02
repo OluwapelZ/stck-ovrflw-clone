@@ -3,8 +3,8 @@ var express = require('express');
 var path = require('path');
 var logger = require('morgan');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var indexRouter = require('./src/routes/index');
+var usersRouter = require('./src/routes/users');
 
 var app = express();
 
