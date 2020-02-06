@@ -2,9 +2,12 @@
   "name": "stck-ovrflw-clone",
   "version": "1.0.0",
   "description": "Service representing a simple clone of stack overflow",
-  "main": "app.js",
+  "main": "dist-server/bin/www.js",
   "scripts": {
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./lib/bin/www.js",
+    "build": "babel --presets es2015 -d lib/ src",
+    "clean": "rimraf lib",
+    "all": "npm-run-all clean build"
   },
   "keywords": [],
   "author": "Oluwapelumi Olaoye",
@@ -15,9 +18,28 @@
     "express": "~4.16.1",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "mongoose": "^5.8.11",
+    "morgan": "~1.9.1",
+    "rimraf": "^3.0.1",
+    "webpack": "^4.41.5"
   },
   "devDependencies": {
-    "nodemon": "^2.0.2"
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "mocha": "^7.0.1",
+    "nodemon": "^2.0.2",
+    "npm-run-all": "^4.1.5"
+  },
+  "nodemonConfig": {
+    "ext": "js",
+    "watch": [
+      "src/*"
+    ],
+    "delay": "2",
+    "ignore": [
+      "**/__tests__/**",
+      "*.test.js",
+      "*.spec.js"
+    ]
   }
 }
