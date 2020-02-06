@@ -4,6 +4,7 @@
   "description": "Service representing a simple clone of stack overflow",
   "main": "dist-server/bin/www.js",
   "scripts": {
+    "test": "mocha --require babel-register src/tests/*.js --exit",
     "dev": "nodemon ./lib/bin/www.js",
     "build": "babel --presets es2015 -d lib/ src",
     "clean": "rimraf lib",
@@ -13,6 +14,8 @@
   "author": "Oluwapelumi Olaoye",
   "license": "MIT",
   "dependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
